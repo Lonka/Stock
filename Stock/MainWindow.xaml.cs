@@ -29,10 +29,7 @@ namespace Stock
         {
             InitializeComponent();
 
-
-
             stockItems = GetAllSections();
-
             foreach (StockItem stockItem in stockItems)
             {
                 AbortableBackgroundWorker getStock = new AbortableBackgroundWorker();
@@ -43,76 +40,86 @@ namespace Stock
                     TextBlock txtPrice = null;
                     while (mGetStockStopFlag)
                     {
-                        if (txtPrice == null)
+                        try
                         {
-                            App.Current.Dispatcher.Invoke((Action)delegate
+                            if (txtPrice == null)
                             {
-                                txtPrice = FindVisualChildByName<TextBlock>(gridStocks, "txtPrice" + stockItem.Code);
-                            });
-                            System.Threading.Thread.Sleep(1000);
-                            continue;
-                        }
-                        else
-                        {
-                            double quotedMarketPrice = StockHelper.GetQuotedMarketPrice(stockItem.Code);
-                            //double quotedMarketPrice = 160;
-                            App.Current.Dispatcher.Invoke((Action)delegate
-                            {
-                                if (quotedMarketPrice == openPrice)
+                                App.Current.Dispatcher.Invoke((Action)delegate
                                 {
-                                    txtPrice.Foreground = Brushes.Black;
-                                }
-                                else if (quotedMarketPrice > openPrice)
-                                {
-                                    txtPrice.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0xC6, 0x33, 0x00));
-                                }
-                                else if (quotedMarketPrice < openPrice)
-                                {
-                                    txtPrice.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0xAA, 0x55));
-                                }
-                                txtPrice.Text = quotedMarketPrice.ToString();
-                            });
-                            #region Alarm
-                            string alarmStr = string.Empty;
-                            if (stockItem.AlarmMore != null)
-                            {
-                                if (quotedMarketPrice >= stockItem.AlarmMore && stockItem.AlarmMoreMax > 0 && DateTime.Now.Subtract(stockItem.AlarmMoreTime).Seconds > 30)
-                                {
-                                    stockItem.AlarmMoreMax--;
-                                    stockItem.AlarmMoreTime = DateTime.Now;
-                                    alarmStr = DateTime.Now.ToString("HH:mm:ss") + "-" + stockItem.Code + " : " + quotedMarketPrice + " more then " + stockItem.AlarmMore;
-                                }
-                                else if (quotedMarketPrice < stockItem.AlarmMore)
-                                {
-                                    stockItem.AlarmMoreMax = 5;
-                                }
+                                    txtPrice = FindVisualChildByName<TextBlock>(gridStocks, "txtPrice" + stockItem.Code);
+                                });
+                                System.Threading.Thread.Sleep(1000);
+                                continue;
                             }
-                            if (stockItem.AlarmLess != null)
+                            else
                             {
-                                if (quotedMarketPrice <= stockItem.AlarmLess && stockItem.AlarmLessMax > 0 && DateTime.Now.Subtract(stockItem.AlarmLessTime).Seconds > 30)
+                                double quotedMarketPrice = StockHelper.GetQuotedMarketPrice(stockItem.Code);
+                                //double quotedMarketPrice = 160;
+                                #region font color
+                                App.Current.Dispatcher.Invoke((Action)delegate
                                 {
-                                    stockItem.AlarmLessMax--;
-                                    stockItem.AlarmLessTime = DateTime.Now;
-                                    alarmStr = DateTime.Now.ToString("HH:mm:ss") + "-" + stockItem.Code + " : " + quotedMarketPrice + " less then " + stockItem.AlarmLess;
-                                }
-                                else if (quotedMarketPrice > stockItem.AlarmLess)
-                                {
-                                    stockItem.AlarmLessMax = 5;
-                                }
-                            }
-                            if (!string.IsNullOrEmpty(alarmStr))
-                            {
-                                BackgroundWorker alarmThread = new BackgroundWorker();
-                                alarmThread.DoWork += (ss, oo) =>
-                                {
-                                    App.Current.Dispatcher.Invoke((Action)delegate
+                                    if (quotedMarketPrice == openPrice)
                                     {
-                                        MessageBox.Show(alarmStr, "Alarm", MessageBoxButton.OK, MessageBoxImage.Warning);
-                                    });
-                                };
-                                alarmThread.RunWorkerAsync();
+                                        txtPrice.Foreground = Brushes.Black;
+                                    }
+                                    else if (quotedMarketPrice > openPrice)
+                                    {
+                                        txtPrice.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0xC6, 0x33, 0x00));
+                                    }
+                                    else if (quotedMarketPrice < openPrice)
+                                    {
+                                        txtPrice.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0xAA, 0x55));
+                                    }
+                                    txtPrice.Text = quotedMarketPrice.ToString();
+                                });
+                                #endregion
+
+                                #region Alarm
+                                string alarmStr = string.Empty;
+                                if (stockItem.AlarmMore != null)
+                                {
+                                    if (quotedMarketPrice >= stockItem.AlarmMore && stockItem.AlarmMoreMax > 0 && DateTime.Now.Subtract(stockItem.AlarmMoreTime).Seconds > 30)
+                                    {
+                                        stockItem.AlarmMoreMax--;
+                                        stockItem.AlarmMoreTime = DateTime.Now;
+                                        alarmStr = DateTime.Now.ToString("HH:mm:ss") + "-" + stockItem.Code + " : " + quotedMarketPrice + " more then " + stockItem.AlarmMore;
+                                    }
+                                    else if (quotedMarketPrice < stockItem.AlarmMore)
+                                    {
+                                        stockItem.AlarmMoreMax = 5;
+                                    }
+                                }
+                                if (stockItem.AlarmLess != null)
+                                {
+                                    if (quotedMarketPrice <= stockItem.AlarmLess && stockItem.AlarmLessMax > 0 && DateTime.Now.Subtract(stockItem.AlarmLessTime).Seconds > 30)
+                                    {
+                                        stockItem.AlarmLessMax--;
+                                        stockItem.AlarmLessTime = DateTime.Now;
+                                        alarmStr = DateTime.Now.ToString("HH:mm:ss") + "-" + stockItem.Code + " : " + quotedMarketPrice + " less then " + stockItem.AlarmLess;
+                                    }
+                                    else if (quotedMarketPrice > stockItem.AlarmLess)
+                                    {
+                                        stockItem.AlarmLessMax = 5;
+                                    }
+                                }
+                                if (!string.IsNullOrEmpty(alarmStr))
+                                {
+                                    BackgroundWorker alarmThread = new BackgroundWorker();
+                                    alarmThread.DoWork += (ss, oo) =>
+                                    {
+                                        App.Current.Dispatcher.Invoke((Action)delegate
+                                        {
+                                            MessageBox.Show(alarmStr, "Alarm", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                        });
+                                    };
+                                    alarmThread.RunWorkerAsync();
+                                }
+                                #endregion
                             }
-                            #endregion
+                        }
+                        catch
+                        {
+
                         }
                         if (DateTime.Now.Hour >= 9 && int.Parse(DateTime.Now.ToString("HHmm")) <= 1330)
                         {
@@ -169,7 +176,6 @@ namespace Stock
             }
             return stockItems;
         }
-
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
