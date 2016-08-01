@@ -38,6 +38,7 @@ namespace Stock
                 {
                     double openPrice = StockHelper.GetOpenPrice(stockItem.Code);
                     TextBlock txtPrice = null;
+                    // 停止的 Flag （全域變數）
                     while (mGetStockStopFlag)
                     {
                         try
@@ -46,6 +47,7 @@ namespace Stock
                             {
                                 App.Current.Dispatcher.Invoke((Action)delegate
                                 {
+                                    // 取得給成交價的 TextBlock 控制項
                                     txtPrice = FindVisualChildByName<TextBlock>(gridStocks, "txtPrice" + stockItem.Code);
                                 });
                                 System.Threading.Thread.Sleep(1000);
@@ -54,7 +56,7 @@ namespace Stock
                             else
                             {
                                 double quotedMarketPrice = StockHelper.GetQuotedMarketPrice(stockItem.Code);
-                                //double quotedMarketPrice = 160;
+
                                 #region font color
                                 App.Current.Dispatcher.Invoke((Action)delegate
                                 {
@@ -229,14 +231,19 @@ namespace Stock
             this.Close();
         }
 
+        /// <summary>
+        /// Find Control
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="parent">parent control</param>
+        /// <param name="name">child name</param>
+        /// <returns></returns>
         public T FindVisualChildByName<T>(DependencyObject parent, string name) where T : DependencyObject
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
             {
                 var child = VisualTreeHelper.GetChild(parent, i);
-
                 string controlName = child.GetValue(Control.NameProperty) as string;
-
                 if (controlName == name)
                 {
                     return child as T;

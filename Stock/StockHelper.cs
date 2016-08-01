@@ -14,12 +14,12 @@ namespace Stock
         {
 
             // 使用預設編碼讀入 HTML 
-            HtmlDocument doc = GetHtemlContent("https://tw.stock.yahoo.com/q/q?s=" + stockCode);
+            HtmlDocument doc = GetHtmlContent("https://tw.stock.yahoo.com/q/q?s=" + stockCode);
 
             // 裝載第一層查詢結果 
             HtmlDocument hdc = new HtmlDocument();
 
-            //XPath 來解讀它 /html[1]/body[1]/center[1]/table[2]/tr[1]/td[1]/table[1] 
+            //XPath 來解讀它
             hdc.LoadHtml(doc.DocumentNode.SelectSingleNode("/html[1]/body[1]/center[1]/table[2]/tr[1]/td[1]/table[1]").InnerHtml);
 
             // 取得個股標頭 
@@ -42,12 +42,12 @@ namespace Stock
         {
 
             // 使用預設編碼讀入 HTML 
-            HtmlDocument doc = GetHtemlContent("https://tw.stock.yahoo.com/q/q?s=" + stockCode);
+            HtmlDocument doc = GetHtmlContent("https://tw.stock.yahoo.com/q/q?s=" + stockCode);
 
             // 裝載第一層查詢結果 
             HtmlDocument hdc = new HtmlDocument();
 
-            //XPath 來解讀它 /html[1]/body[1]/center[1]/table[2]/tr[1]/td[1]/table[1] 
+            //XPath 來解讀它
             hdc.LoadHtml(doc.DocumentNode.SelectSingleNode("/html[1]/body[1]/center[1]/table[2]/tr[1]/td[1]/table[1]").InnerHtml);
 
             // 取得個股標頭 
@@ -65,7 +65,7 @@ namespace Stock
             return result;
         }
 
-        public static HtmlDocument GetHtemlContent(string url)
+        public static HtmlDocument GetHtmlContent(string url)
         {
             //url = "https://tw.stock.yahoo.com/q/q?s=2308";
             HtmlDocument content = new HtmlDocument();
